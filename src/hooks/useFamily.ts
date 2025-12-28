@@ -1,5 +1,16 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { getUserFamilies, getFamily, getFamilyMembers, createFamily, joinFamily, addFamilyMember } from '../lib/supabase/queries'
+import {
+  getUserFamilies,
+  getFamily,
+  getFamilyMembers,
+  createFamily,
+  joinFamily,
+  addFamilyMember,
+  getFamilyRelationships,
+  addFamilyRelationship,
+  removeFamilyRelationship,
+  getMemberRecipeCount,
+} from '../lib/supabase/queries'
 import type { FamilyMemberInsert } from '../lib/supabase/types'
 
 export function useUserFamilies() {
@@ -70,5 +81,67 @@ export function useAddFamilyMember() {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['family-members', variables.family_id] })
     },
+  })
+}
+
+export function useFamilyRelationships(familyId: string | undefined) {
+  return useQuery({
+    queryKey: ['family-relationships', familyId],
+    queryFn: async () => {
+      if (!familyId) return []
+      const { data, error } = await getFamilyRelationships(familyId)
+      if (error) throw error
+      return data
+    },
+    enabled: !!familyId,
+  })
+}
+
+export function useAddFamilyRelationship() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({
+      familyId,
+      parentId,
+      childId,
+    }: {
+      familyId: string
+      parentId: string
+      childId: string
+    }) => addFamilyRelationship(familyId, parentId, childId),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['family-relationships', variables.familyId] })
+    },
+  })
+}
+
+export function useRemoveFamilyRelationship() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({
+      relationshipId,
+      familyId,
+    }: {
+      relationshipId: string
+      familyId: string
+    }) => removeFamilyRelationship(relationshipId).then((r) => ({ ...r, familyId })),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['family-relationships', variables.familyId] })
+    },
+  })
+}
+
+export function useMemberRecipeCounts(familyId: string | undefined) {
+  return useQuery({
+    queryKey: ['member-recipe-counts', familyId],
+    queryFn: async () => {
+      if (!familyId) return {}
+      const { data, error } = await getMemberRecipeCount(familyId)
+      if (error) throw error
+      return data || {}
+    },
+    enabled: !!familyId,
   })
 }

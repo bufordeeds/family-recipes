@@ -302,3 +302,61 @@ export async function deleteRecipe(recipeId: string) {
     .delete()
     .eq('id', recipeId)
 }
+
+// Family relationship queries
+export async function getFamilyRelationships(familyId: string) {
+  const supabase = createClient()
+  return supabase
+    .from('family_member_relationships')
+    .select('*')
+    .eq('family_id', familyId)
+}
+
+export async function addFamilyRelationship(
+  familyId: string,
+  parentId: string,
+  childId: string
+) {
+  const supabase = createClient()
+  return supabase
+    .from('family_member_relationships')
+    .insert({
+      family_id: familyId,
+      parent_id: parentId,
+      child_id: childId,
+    })
+    .select()
+    .single()
+}
+
+export async function removeFamilyRelationship(relationshipId: string) {
+  const supabase = createClient()
+  return supabase
+    .from('family_member_relationships')
+    .delete()
+    .eq('id', relationshipId)
+}
+
+export async function getMemberRecipeCount(familyId: string) {
+  const supabase = createClient()
+
+  // Get recipe counts per family member through attributions
+  const { data, error } = await supabase
+    .from('recipe_attributions')
+    .select(`
+      family_member_id,
+      recipe:recipes!inner(family_id)
+    `)
+    .eq('recipe.family_id', familyId)
+
+  if (error) return { data: null, error }
+
+  // Count recipes per member
+  const counts: Record<string, number> = {}
+  data?.forEach((attr) => {
+    const memberId = attr.family_member_id
+    counts[memberId] = (counts[memberId] || 0) + 1
+  })
+
+  return { data: counts, error: null }
+}
