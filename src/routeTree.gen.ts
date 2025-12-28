@@ -11,10 +11,13 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as RecipesNewRouteImport } from './routes/recipes/new'
+import { Route as RecipesRecipeIdRouteImport } from './routes/recipes/$recipeId'
 import { Route as FamilySetupRouteImport } from './routes/family/setup'
 import { Route as FamilyFamilyIdRouteImport } from './routes/family/$familyId'
 import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
 import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
+import { Route as RecipesRecipeIdCookRouteImport } from './routes/recipes/$recipeId.cook'
 import { Route as DemoStartServerFuncsRouteImport } from './routes/demo/start.server-funcs'
 import { Route as DemoStartApiRequestRouteImport } from './routes/demo/start.api-request'
 import { Route as DemoApiTqTodosRouteImport } from './routes/demo/api.tq-todos'
@@ -32,6 +35,16 @@ const LoginRoute = LoginRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RecipesNewRoute = RecipesNewRouteImport.update({
+  id: '/recipes/new',
+  path: '/recipes/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RecipesRecipeIdRoute = RecipesRecipeIdRouteImport.update({
+  id: '/recipes/$recipeId',
+  path: '/recipes/$recipeId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FamilySetupRoute = FamilySetupRouteImport.update({
@@ -53,6 +66,11 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
   id: '/auth/callback',
   path: '/auth/callback',
   getParentRoute: () => rootRouteImport,
+} as any)
+const RecipesRecipeIdCookRoute = RecipesRecipeIdCookRouteImport.update({
+  id: '/cook',
+  path: '/cook',
+  getParentRoute: () => RecipesRecipeIdRoute,
 } as any)
 const DemoStartServerFuncsRoute = DemoStartServerFuncsRouteImport.update({
   id: '/demo/start/server-funcs',
@@ -102,10 +120,13 @@ export interface FileRoutesByFullPath {
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/family/$familyId': typeof FamilyFamilyIdRoute
   '/family/setup': typeof FamilySetupRoute
+  '/recipes/$recipeId': typeof RecipesRecipeIdRouteWithChildren
+  '/recipes/new': typeof RecipesNewRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/recipes/$recipeId/cook': typeof RecipesRecipeIdCookRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
@@ -118,10 +139,13 @@ export interface FileRoutesByTo {
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/family/$familyId': typeof FamilyFamilyIdRoute
   '/family/setup': typeof FamilySetupRoute
+  '/recipes/$recipeId': typeof RecipesRecipeIdRouteWithChildren
+  '/recipes/new': typeof RecipesNewRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/recipes/$recipeId/cook': typeof RecipesRecipeIdCookRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
@@ -135,10 +159,13 @@ export interface FileRoutesById {
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/family/$familyId': typeof FamilyFamilyIdRoute
   '/family/setup': typeof FamilySetupRoute
+  '/recipes/$recipeId': typeof RecipesRecipeIdRouteWithChildren
+  '/recipes/new': typeof RecipesNewRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/recipes/$recipeId/cook': typeof RecipesRecipeIdCookRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
@@ -153,10 +180,13 @@ export interface FileRouteTypes {
     | '/demo/tanstack-query'
     | '/family/$familyId'
     | '/family/setup'
+    | '/recipes/$recipeId'
+    | '/recipes/new'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
+    | '/recipes/$recipeId/cook'
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
@@ -169,10 +199,13 @@ export interface FileRouteTypes {
     | '/demo/tanstack-query'
     | '/family/$familyId'
     | '/family/setup'
+    | '/recipes/$recipeId'
+    | '/recipes/new'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
+    | '/recipes/$recipeId/cook'
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
@@ -185,10 +218,13 @@ export interface FileRouteTypes {
     | '/demo/tanstack-query'
     | '/family/$familyId'
     | '/family/setup'
+    | '/recipes/$recipeId'
+    | '/recipes/new'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
+    | '/recipes/$recipeId/cook'
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
@@ -202,6 +238,8 @@ export interface RootRouteChildren {
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
   FamilyFamilyIdRoute: typeof FamilyFamilyIdRoute
   FamilySetupRoute: typeof FamilySetupRoute
+  RecipesRecipeIdRoute: typeof RecipesRecipeIdRouteWithChildren
+  RecipesNewRoute: typeof RecipesNewRoute
   DemoApiNamesRoute: typeof DemoApiNamesRoute
   DemoApiTqTodosRoute: typeof DemoApiTqTodosRoute
   DemoStartApiRequestRoute: typeof DemoStartApiRequestRoute
@@ -226,6 +264,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/recipes/new': {
+      id: '/recipes/new'
+      path: '/recipes/new'
+      fullPath: '/recipes/new'
+      preLoaderRoute: typeof RecipesNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/recipes/$recipeId': {
+      id: '/recipes/$recipeId'
+      path: '/recipes/$recipeId'
+      fullPath: '/recipes/$recipeId'
+      preLoaderRoute: typeof RecipesRecipeIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/family/setup': {
@@ -255,6 +307,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/auth/callback'
       preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/recipes/$recipeId/cook': {
+      id: '/recipes/$recipeId/cook'
+      path: '/cook'
+      fullPath: '/recipes/$recipeId/cook'
+      preLoaderRoute: typeof RecipesRecipeIdCookRouteImport
+      parentRoute: typeof RecipesRecipeIdRoute
     }
     '/demo/start/server-funcs': {
       id: '/demo/start/server-funcs'
@@ -315,6 +374,18 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface RecipesRecipeIdRouteChildren {
+  RecipesRecipeIdCookRoute: typeof RecipesRecipeIdCookRoute
+}
+
+const RecipesRecipeIdRouteChildren: RecipesRecipeIdRouteChildren = {
+  RecipesRecipeIdCookRoute: RecipesRecipeIdCookRoute,
+}
+
+const RecipesRecipeIdRouteWithChildren = RecipesRecipeIdRoute._addFileChildren(
+  RecipesRecipeIdRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LoginRoute: LoginRoute,
@@ -322,6 +393,8 @@ const rootRouteChildren: RootRouteChildren = {
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
   FamilyFamilyIdRoute: FamilyFamilyIdRoute,
   FamilySetupRoute: FamilySetupRoute,
+  RecipesRecipeIdRoute: RecipesRecipeIdRouteWithChildren,
+  RecipesNewRoute: RecipesNewRoute,
   DemoApiNamesRoute: DemoApiNamesRoute,
   DemoApiTqTodosRoute: DemoApiTqTodosRoute,
   DemoStartApiRequestRoute: DemoStartApiRequestRoute,

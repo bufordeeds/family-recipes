@@ -149,3 +149,156 @@ export async function updateFamilyMember(id: string, updates: Partial<FamilyMemb
     .select()
     .single()
 }
+
+// Recipe queries
+export async function getFamilyRecipes(familyId: string) {
+  const supabase = createClient()
+  return supabase
+    .from('recipes')
+    .select(`
+      *,
+      attributions:recipe_attributions(
+        *,
+        family_member:family_members(*)
+      )
+    `)
+    .eq('family_id', familyId)
+    .order('created_at', { ascending: false })
+}
+
+export async function getRecipe(recipeId: string) {
+  const supabase = createClient()
+  return supabase
+    .from('recipes')
+    .select(`
+      *,
+      ingredients(*),
+      steps(*),
+      attributions:recipe_attributions(
+        *,
+        family_member:family_members(*)
+      ),
+      comments(
+        *,
+        profile:profiles(*)
+      )
+    `)
+    .eq('id', recipeId)
+    .single()
+}
+
+export interface CreateRecipeInput {
+  familyId: string
+  title: string
+  description?: string
+  originStory?: string
+  originYear?: number
+  originLocation?: string
+  prepTime?: number
+  cookTime?: number
+  servings?: number
+  difficulty?: 'easy' | 'medium' | 'hard'
+  heroImageUrl?: string
+  ingredients: string[]
+  steps: string[]
+  attributedTo?: string // family_member_id
+}
+
+export async function createRecipe(input: CreateRecipeInput) {
+  const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) return { data: null, error: new Error('Not authenticated') }
+
+  // Create the recipe
+  const { data: recipe, error: recipeError } = await supabase
+    .from('recipes')
+    .insert({
+      family_id: input.familyId,
+      title: input.title,
+      description: input.description,
+      origin_story: input.originStory,
+      origin_year: input.originYear,
+      origin_location: input.originLocation,
+      prep_time: input.prepTime,
+      cook_time: input.cookTime,
+      servings: input.servings,
+      difficulty: input.difficulty,
+      hero_image_url: input.heroImageUrl,
+      created_by: user.id,
+    } as RecipeInsert)
+    .select()
+    .single()
+
+  if (recipeError || !recipe) return { data: null, error: recipeError }
+
+  // Add ingredients
+  if (input.ingredients.length > 0) {
+    const ingredientsToInsert: IngredientInsert[] = input.ingredients.map((text, index) => ({
+      recipe_id: recipe.id,
+      text,
+      order_index: index,
+    }))
+
+    const { error: ingredientsError } = await supabase
+      .from('ingredients')
+      .insert(ingredientsToInsert)
+
+    if (ingredientsError) {
+      // Rollback recipe
+      await supabase.from('recipes').delete().eq('id', recipe.id)
+      return { data: null, error: ingredientsError }
+    }
+  }
+
+  // Add steps
+  if (input.steps.length > 0) {
+    const stepsToInsert: StepInsert[] = input.steps.map((instruction, index) => ({
+      recipe_id: recipe.id,
+      instruction,
+      order_index: index,
+    }))
+
+    const { error: stepsError } = await supabase
+      .from('steps')
+      .insert(stepsToInsert)
+
+    if (stepsError) {
+      // Rollback
+      await supabase.from('ingredients').delete().eq('recipe_id', recipe.id)
+      await supabase.from('recipes').delete().eq('id', recipe.id)
+      return { data: null, error: stepsError }
+    }
+  }
+
+  // Add attribution if provided
+  if (input.attributedTo) {
+    await supabase
+      .from('recipe_attributions')
+      .insert({
+        recipe_id: recipe.id,
+        family_member_id: input.attributedTo,
+        attribution_type: 'created_by',
+      })
+  }
+
+  return { data: recipe, error: null }
+}
+
+export async function updateRecipe(recipeId: string, updates: RecipeUpdate) {
+  const supabase = createClient()
+  return supabase
+    .from('recipes')
+    .update(updates)
+    .eq('id', recipeId)
+    .select()
+    .single()
+}
+
+export async function deleteRecipe(recipeId: string) {
+  const supabase = createClient()
+  return supabase
+    .from('recipes')
+    .delete()
+    .eq('id', recipeId)
+}

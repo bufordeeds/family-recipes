@@ -1,7 +1,9 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useAuth } from '../hooks/useAuth'
 import { useUserFamilies } from '../hooks/useFamily'
+import { useFamilyRecipes } from '../hooks/useRecipes'
 import { ChefHat, Users, Clock, BookOpen, ArrowRight } from 'lucide-react'
+import type { Recipe } from '../lib/supabase/types'
 
 export const Route = createFileRoute('/')({
   component: HomePage,
@@ -133,6 +135,8 @@ function NoFamilyState() {
 }
 
 function FamilyDashboard({ family }: { family: { id: string; name: string } }) {
+  const { data: recipes, isLoading } = useFamilyRecipes(family.id)
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50 pb-24 md:pb-8">
       {/* Welcome Header */}
@@ -167,27 +171,94 @@ function FamilyDashboard({ family }: { family: { id: string; name: string } }) {
         </div>
       </section>
 
-      {/* Empty State - No Recipes Yet */}
+      {/* Recipe List */}
       <section className="px-6">
-        <div className="bg-white rounded-2xl p-8 text-center shadow-sm">
-          <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <BookOpen className="w-8 h-8 text-amber-600" />
+        {isLoading ? (
+          <div className="flex justify-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-600" />
           </div>
-          <h2 className="text-lg font-semibold text-gray-900 mb-2">
-            No recipes yet
-          </h2>
-          <p className="text-gray-600 mb-6">
-            Start preserving your family's culinary heritage by adding your first recipe.
-          </p>
-          <Link
-            to="/recipes/new"
-            className="inline-flex items-center gap-2 px-6 py-2 bg-amber-600 hover:bg-amber-700 text-white font-medium rounded-xl transition-colors"
-          >
-            <ChefHat className="w-5 h-5" />
-            Add Your First Recipe
-          </Link>
-        </div>
+        ) : recipes && recipes.length > 0 ? (
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">
+              Family Recipes
+              <span className="text-gray-400 font-normal ml-2">({recipes.length})</span>
+            </h2>
+            <div className="space-y-4">
+              {recipes.map((recipe) => (
+                <RecipeCard key={recipe.id} recipe={recipe} />
+              ))}
+            </div>
+          </div>
+        ) : (
+          <EmptyRecipeState />
+        )}
       </section>
+    </div>
+  )
+}
+
+function RecipeCard({ recipe }: { recipe: Recipe & { attributions?: Array<{ family_member?: { name: string } }> } }) {
+  const totalTime = (recipe.prep_time || 0) + (recipe.cook_time || 0)
+  const attribution = recipe.attributions?.[0]?.family_member?.name
+
+  return (
+    <Link
+      to="/recipes/$recipeId"
+      params={{ recipeId: recipe.id }}
+      className="block bg-white rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition-shadow"
+    >
+      {recipe.hero_image_url && (
+        <div className="h-40 bg-amber-100">
+          <img
+            src={recipe.hero_image_url}
+            alt={recipe.title}
+            className="w-full h-full object-cover"
+          />
+        </div>
+      )}
+      <div className="p-4">
+        <h3 className="font-semibold text-gray-900 mb-1">{recipe.title}</h3>
+        {attribution && (
+          <p className="text-sm text-amber-600 mb-2">From {attribution}'s kitchen</p>
+        )}
+        <div className="flex items-center gap-4 text-sm text-gray-500">
+          {totalTime > 0 && (
+            <span className="flex items-center gap-1">
+              <Clock className="w-4 h-4" />
+              {totalTime} min
+            </span>
+          )}
+          {recipe.difficulty && (
+            <span className="capitalize">{recipe.difficulty}</span>
+          )}
+          {recipe.origin_year && (
+            <span>Since {recipe.origin_year}</span>
+          )}
+        </div>
+      </div>
+    </Link>
+  )
+}
+
+function EmptyRecipeState() {
+  return (
+    <div className="bg-white rounded-2xl p-8 text-center shadow-sm">
+      <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <BookOpen className="w-8 h-8 text-amber-600" />
+      </div>
+      <h2 className="text-lg font-semibold text-gray-900 mb-2">
+        No recipes yet
+      </h2>
+      <p className="text-gray-600 mb-6">
+        Start preserving your family's culinary heritage by adding your first recipe.
+      </p>
+      <Link
+        to="/recipes/new"
+        className="inline-flex items-center gap-2 px-6 py-2 bg-amber-600 hover:bg-amber-700 text-white font-medium rounded-xl transition-colors"
+      >
+        <ChefHat className="w-5 h-5" />
+        Add Your First Recipe
+      </Link>
     </div>
   )
 }
