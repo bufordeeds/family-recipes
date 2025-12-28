@@ -1,190 +1,143 @@
 import { Link } from '@tanstack/react-router'
-
-import { useState } from 'react'
-import {
-  ChevronDown,
-  ChevronRight,
-  Home,
-  Menu,
-  Network,
-  SquareFunction,
-  StickyNote,
-  X,
-} from 'lucide-react'
+import { useAuth } from '../hooks/useAuth'
+import { signOut } from '../lib/supabase/auth'
+import { Home, TreeDeciduous, PlusCircle, Search, User, LogOut } from 'lucide-react'
 
 export default function Header() {
-  const [isOpen, setIsOpen] = useState(false)
-  const [groupedExpanded, setGroupedExpanded] = useState<
-    Record<string, boolean>
-  >({})
+  const { user, loading } = useAuth()
+
+  async function handleSignOut() {
+    await signOut()
+    window.location.href = '/login'
+  }
+
+  // Don't show header on login page
+  if (typeof window !== 'undefined' && window.location.pathname === '/login') {
+    return null
+  }
 
   return (
     <>
-      <header className="p-4 flex items-center bg-gray-800 text-white shadow-lg">
-        <button
-          onClick={() => setIsOpen(true)}
-          className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
-          aria-label="Open menu"
-        >
-          <Menu size={24} />
-        </button>
-        <h1 className="ml-4 text-xl font-semibold">
-          <Link to="/">
-            <img
-              src="/tanstack-word-logo-white.svg"
-              alt="TanStack Logo"
-              className="h-10"
-            />
-          </Link>
-        </h1>
-      </header>
+      {/* Desktop Header */}
+      <header className="hidden md:flex items-center justify-between px-6 py-4 bg-white border-b border-amber-100">
+        <Link to="/" className="text-xl font-bold text-amber-900">
+          Family Recipes
+        </Link>
 
-      <aside
-        className={`fixed top-0 left-0 h-full w-80 bg-gray-900 text-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out flex flex-col ${
-          isOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
-      >
-        <div className="flex items-center justify-between p-4 border-b border-gray-700">
-          <h2 className="text-xl font-bold">Navigation</h2>
-          <button
-            onClick={() => setIsOpen(false)}
-            className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
-            aria-label="Close menu"
-          >
-            <X size={24} />
-          </button>
-        </div>
-
-        <nav className="flex-1 p-4 overflow-y-auto">
+        <nav className="flex items-center gap-6">
           <Link
             to="/"
-            onClick={() => setIsOpen(false)}
-            className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-2"
-            activeProps={{
-              className:
-                'flex items-center gap-3 p-3 rounded-lg bg-cyan-600 hover:bg-cyan-700 transition-colors mb-2',
-            }}
+            className="text-amber-700 hover:text-amber-900 transition-colors"
+            activeProps={{ className: 'text-amber-900 font-medium' }}
           >
-            <Home size={20} />
-            <span className="font-medium">Home</span>
+            Home
           </Link>
-
-          {/* Demo Links Start */}
-
-          <Link
-            to="/demo/start/server-funcs"
-            onClick={() => setIsOpen(false)}
-            className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-2"
-            activeProps={{
-              className:
-                'flex items-center gap-3 p-3 rounded-lg bg-cyan-600 hover:bg-cyan-700 transition-colors mb-2',
-            }}
-          >
-            <SquareFunction size={20} />
-            <span className="font-medium">Start - Server Functions</span>
-          </Link>
-
-          <Link
-            to="/demo/start/api-request"
-            onClick={() => setIsOpen(false)}
-            className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-2"
-            activeProps={{
-              className:
-                'flex items-center gap-3 p-3 rounded-lg bg-cyan-600 hover:bg-cyan-700 transition-colors mb-2',
-            }}
-          >
-            <Network size={20} />
-            <span className="font-medium">Start - API Request</span>
-          </Link>
-
-          <div className="flex flex-row justify-between">
-            <Link
-              to="/demo/start/ssr"
-              onClick={() => setIsOpen(false)}
-              className="flex-1 flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-2"
-              activeProps={{
-                className:
-                  'flex-1 flex items-center gap-3 p-3 rounded-lg bg-cyan-600 hover:bg-cyan-700 transition-colors mb-2',
-              }}
-            >
-              <StickyNote size={20} />
-              <span className="font-medium">Start - SSR Demos</span>
-            </Link>
-            <button
-              className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
-              onClick={() =>
-                setGroupedExpanded((prev) => ({
-                  ...prev,
-                  StartSSRDemo: !prev.StartSSRDemo,
-                }))
-              }
-            >
-              {groupedExpanded.StartSSRDemo ? (
-                <ChevronDown size={20} />
-              ) : (
-                <ChevronRight size={20} />
-              )}
-            </button>
-          </div>
-          {groupedExpanded.StartSSRDemo && (
-            <div className="flex flex-col ml-4">
+          {user && (
+            <>
               <Link
-                to="/demo/start/ssr/spa-mode"
-                onClick={() => setIsOpen(false)}
-                className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-2"
-                activeProps={{
-                  className:
-                    'flex items-center gap-3 p-3 rounded-lg bg-cyan-600 hover:bg-cyan-700 transition-colors mb-2',
-                }}
+                to="/tree"
+                className="text-amber-700 hover:text-amber-900 transition-colors"
+                activeProps={{ className: 'text-amber-900 font-medium' }}
               >
-                <StickyNote size={20} />
-                <span className="font-medium">SPA Mode</span>
+                Family Tree
               </Link>
-
               <Link
-                to="/demo/start/ssr/full-ssr"
-                onClick={() => setIsOpen(false)}
-                className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-2"
-                activeProps={{
-                  className:
-                    'flex items-center gap-3 p-3 rounded-lg bg-cyan-600 hover:bg-cyan-700 transition-colors mb-2',
-                }}
+                to="/recipes/new"
+                className="text-amber-700 hover:text-amber-900 transition-colors"
+                activeProps={{ className: 'text-amber-900 font-medium' }}
               >
-                <StickyNote size={20} />
-                <span className="font-medium">Full SSR</span>
+                Add Recipe
               </Link>
-
-              <Link
-                to="/demo/start/ssr/data-only"
-                onClick={() => setIsOpen(false)}
-                className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-2"
-                activeProps={{
-                  className:
-                    'flex items-center gap-3 p-3 rounded-lg bg-cyan-600 hover:bg-cyan-700 transition-colors mb-2',
-                }}
-              >
-                <StickyNote size={20} />
-                <span className="font-medium">Data Only</span>
-              </Link>
-            </div>
+            </>
           )}
+        </nav>
 
+        <div className="flex items-center gap-4">
+          {loading ? (
+            <div className="w-8 h-8 rounded-full bg-amber-100 animate-pulse" />
+          ) : user ? (
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-amber-700">{user.email}</span>
+              <button
+                onClick={handleSignOut}
+                className="p-2 text-amber-600 hover:text-amber-800 hover:bg-amber-50 rounded-lg transition-colors"
+                title="Sign out"
+              >
+                <LogOut size={20} />
+              </button>
+            </div>
+          ) : (
+            <Link
+              to="/login"
+              className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-medium rounded-lg transition-colors"
+            >
+              Sign in
+            </Link>
+          )}
+        </div>
+      </header>
+
+      {/* Mobile Bottom Tab Bar */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-amber-100 px-2 pb-safe z-50">
+        <div className="flex items-center justify-around py-2">
           <Link
-            to="/demo/tanstack-query"
-            onClick={() => setIsOpen(false)}
-            className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-2"
-            activeProps={{
-              className:
-                'flex items-center gap-3 p-3 rounded-lg bg-cyan-600 hover:bg-cyan-700 transition-colors mb-2',
-            }}
+            to="/"
+            className="flex flex-col items-center gap-1 px-3 py-2 text-amber-600"
+            activeProps={{ className: 'flex flex-col items-center gap-1 px-3 py-2 text-amber-900' }}
           >
-            <Network size={20} />
-            <span className="font-medium">TanStack Query</span>
+            <Home size={24} />
+            <span className="text-xs">Home</span>
           </Link>
 
-          {/* Demo Links End */}
-        </nav>
-      </aside>
+          {user ? (
+            <>
+              <Link
+                to="/tree"
+                className="flex flex-col items-center gap-1 px-3 py-2 text-amber-600"
+                activeProps={{ className: 'flex flex-col items-center gap-1 px-3 py-2 text-amber-900' }}
+              >
+                <TreeDeciduous size={24} />
+                <span className="text-xs">Tree</span>
+              </Link>
+
+              <Link
+                to="/recipes/new"
+                className="flex flex-col items-center gap-1 px-3 py-2"
+              >
+                <div className="bg-amber-600 text-white p-2 rounded-full -mt-4 shadow-lg">
+                  <PlusCircle size={28} />
+                </div>
+              </Link>
+
+              <Link
+                to="/search"
+                className="flex flex-col items-center gap-1 px-3 py-2 text-amber-600"
+                activeProps={{ className: 'flex flex-col items-center gap-1 px-3 py-2 text-amber-900' }}
+              >
+                <Search size={24} />
+                <span className="text-xs">Search</span>
+              </Link>
+
+              <Link
+                to="/profile"
+                className="flex flex-col items-center gap-1 px-3 py-2 text-amber-600"
+                activeProps={{ className: 'flex flex-col items-center gap-1 px-3 py-2 text-amber-900' }}
+              >
+                <User size={24} />
+                <span className="text-xs">Profile</span>
+              </Link>
+            </>
+          ) : (
+            <Link
+              to="/login"
+              className="flex flex-col items-center gap-1 px-3 py-2 text-amber-600"
+            >
+              <User size={24} />
+              <span className="text-xs">Sign in</span>
+            </Link>
+          )}
+        </div>
+      </nav>
     </>
   )
 }
