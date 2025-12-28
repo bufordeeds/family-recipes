@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as FamilySetupRouteImport } from './routes/family/setup'
+import { Route as FamilyFamilyIdRouteImport } from './routes/family/$familyId'
 import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
 import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
 import { Route as DemoStartServerFuncsRouteImport } from './routes/demo/start.server-funcs'
@@ -30,6 +32,16 @@ const LoginRoute = LoginRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FamilySetupRoute = FamilySetupRouteImport.update({
+  id: '/family/setup',
+  path: '/family/setup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FamilyFamilyIdRoute = FamilyFamilyIdRouteImport.update({
+  id: '/family/$familyId',
+  path: '/family/$familyId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DemoTanstackQueryRoute = DemoTanstackQueryRouteImport.update({
@@ -88,6 +100,8 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/family/$familyId': typeof FamilyFamilyIdRoute
+  '/family/setup': typeof FamilySetupRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
@@ -102,6 +116,8 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/family/$familyId': typeof FamilyFamilyIdRoute
+  '/family/setup': typeof FamilySetupRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
@@ -117,6 +133,8 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/family/$familyId': typeof FamilyFamilyIdRoute
+  '/family/setup': typeof FamilySetupRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
@@ -133,6 +151,8 @@ export interface FileRouteTypes {
     | '/login'
     | '/auth/callback'
     | '/demo/tanstack-query'
+    | '/family/$familyId'
+    | '/family/setup'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
     | '/demo/start/api-request'
@@ -147,6 +167,8 @@ export interface FileRouteTypes {
     | '/login'
     | '/auth/callback'
     | '/demo/tanstack-query'
+    | '/family/$familyId'
+    | '/family/setup'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
     | '/demo/start/api-request'
@@ -161,6 +183,8 @@ export interface FileRouteTypes {
     | '/login'
     | '/auth/callback'
     | '/demo/tanstack-query'
+    | '/family/$familyId'
+    | '/family/setup'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
     | '/demo/start/api-request'
@@ -176,6 +200,8 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
+  FamilyFamilyIdRoute: typeof FamilyFamilyIdRoute
+  FamilySetupRoute: typeof FamilySetupRoute
   DemoApiNamesRoute: typeof DemoApiNamesRoute
   DemoApiTqTodosRoute: typeof DemoApiTqTodosRoute
   DemoStartApiRequestRoute: typeof DemoStartApiRequestRoute
@@ -200,6 +226,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/family/setup': {
+      id: '/family/setup'
+      path: '/family/setup'
+      fullPath: '/family/setup'
+      preLoaderRoute: typeof FamilySetupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/family/$familyId': {
+      id: '/family/$familyId'
+      path: '/family/$familyId'
+      fullPath: '/family/$familyId'
+      preLoaderRoute: typeof FamilyFamilyIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/demo/tanstack-query': {
@@ -280,6 +320,8 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
+  FamilyFamilyIdRoute: FamilyFamilyIdRoute,
+  FamilySetupRoute: FamilySetupRoute,
   DemoApiNamesRoute: DemoApiNamesRoute,
   DemoApiTqTodosRoute: DemoApiTqTodosRoute,
   DemoStartApiRequestRoute: DemoStartApiRequestRoute,
